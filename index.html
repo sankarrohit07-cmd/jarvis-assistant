@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<meta name="description" content="Your personal JARVIS assistant prototype for tasks, reminders, email drafts and business leads.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>JARVIS | Personal Assistant</title>
+<style>
+:root{color-scheme:dark;--bg:#07111f;--panel:#101d30;--panel2:#14243a;--line:#263951;--text:#edf5ff;--muted:#9db0c9;--cyan:#60d8f2;--blue:#5d8dff;--green:#75e0b1;--red:#ff8b91;--gold:#ffd17a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#132b49 0%,var(--bg) 54%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#1a2c45;color:var(--text);border-radius:13px;padding:11px 13px}button:active{transform:scale(.985)}button.primary{background:linear-gradient(135deg,#147b9b,#375de3);border-color:#4c9dd4;font-weight:700}button.subtle{background:transparent}button.danger{border-color:#70414b;color:#ffc1c4}
+header{position:sticky;top:0;z-index:5;background:#07111feF;border-bottom:1px solid var(--line);backdrop-filter:blur(16px);padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+.brand{display:flex;align-items:center;gap:12px}.orb{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#c9fbff,#38b5dc 28%,#2149a8 65%,#0c1734);box-shadow:0 0 22px #2ca5e866;font-size:21px}.brand h1{font-size:18px;letter-spacing:.16em;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}.status{margin-left:auto;font-size:11px;color:var(--green);border:1px solid #326b61;padding:5px 8px;border-radius:99px}
+main{max-width:760px;margin:auto;padding:16px 14px calc(96px + env(safe-area-inset-bottom))}
+.greeting{padding:14px 2px 18px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800}.greeting h2{font-size:27px;line-height:1.12;margin:7px 0}.greeting p{color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:linear-gradient(160deg,#14243a,#0d192b);border:1px solid var(--line);border-radius:19px;padding:15px;box-shadow:0 10px 30px #0002}.card h3{font-size:14px;margin:0 0 8px}.metric{font-size:28px;font-weight:750;letter-spacing:-.04em}.muted{color:var(--muted)}.small{font-size:12px}.wide{grid-column:1/-1}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 2px 10px}.section-head h2{font-size:17px;margin:0}.list{display:grid;gap:9px}.item{display:flex;gap:10px;align-items:flex-start;background:#0e1b2d;border:1px solid var(--line);padding:12px;border-radius:14px}.item .body{flex:1;min-width:0}.item strong{display:block;overflow-wrap:anywhere}.item p{margin:4px 0 0;color:var(--muted);font-size:12px;overflow-wrap:anywhere}.tag{display:inline-block;font-size:10px;border:1px solid #3b5875;border-radius:99px;padding:3px 7px;color:#bfeaff;margin-top:5px}.empty{border:1px dashed #31455e;border-radius:14px;padding:20px;text-align:center;color:var(--muted)}
+nav{position:fixed;z-index:10;bottom:0;left:0;right:0;padding:9px 8px calc(9px + env(safe-area-inset-bottom));background:#07111ff2;border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;backdrop-filter:blur(16px)}nav button{flex:1;max-width:120px;padding:9px 3px;background:transparent;border-color:transparent;color:var(--muted);font-size:11px}nav button span{display:block;font-size:19px;margin-bottom:2px}nav button.active{color:var(--cyan);background:#14304a;border-color:#27506a}
+.view{display:none}.view.active{display:block}
+.form{display:grid;gap:10px}.form label{font-size:12px;color:var(--muted);display:grid;gap:5px}.form input,.form textarea,.form select{width:100%;background:#091526;color:var(--text);border:1px solid #30445e;border-radius:11px;padding:12px;outline:none}.form textarea{min-height:92px;resize:vertical}.form input:focus,.form textarea:focus,.form select:focus{border-color:var(--cyan)}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.actions button{font-size:12px;padding:8px 10px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar>*{flex:1}
+.hero{background:linear-gradient(120deg,#0e526c,#19388b 70%,#25285d);border:1px solid #3a6d9a;border-radius:20px;padding:17px;margin-bottom:14px}.hero h3{margin:0 0 6px}.hero p{margin:0;color:#d3e9ff;font-size:13px}.mic{width:68px;height:68px;border-radius:50%;font-size:25px;background:linear-gradient(145deg,#197e9b,#344fe3);border:1px solid #75d9ff;box-shadow:0 0 30px #39c9f344}
+.notice{border:1px solid #715e32;background:#322a19;color:#ffe2a3;padding:11px 12px;border-radius:13px;font-size:12px;margin:12px 0}
+.toast{position:fixed;z-index:30;bottom:90px;left:50%;transform:translateX(-50%);max-width:90vw;background:#e6f7ff;color:#07111f;border-radius:12px;padding:11px 16px;box-shadow:0 6px 25px #0006;display:none;font-weight:650;font-size:13px}
+footer{text-align:center;color:#7289a5;font-size:11px;padding:22px 4px}
+@media(min-width:600px){main{padding-top:24px}.greeting h2{font-size:34px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="orb">✦</div><div><h1>J.A.R.V.I.S.</h1><p>Personal operations system</p></div><div class="status">● LOCAL MODE</div></div>
+</header>
+<main>
+ <section class="view active" id="view-home">
+  <div class="greeting"><div class="eyebrow" id="dateLine">PERSONAL ASSISTANT</div><h2>Good to see you, Rohit.</h2><p>Your day, organised. Your next move, clearer.</p></div>
+  <div class="hero"><div class="eyebrow">JARVIS VOICE CONSOLE</div><h3 id="voiceStatus">Standing by.</h3><p id="voiceHint">Tap the microphone to speak, or use the command box below.</p><div style="display:flex;align-items:center;gap:14px;margin-top:15px"><button class="mic" id="micBtn" aria-label="Speak to JARVIS">🎙</button><div style="flex:1"><div class="small muted">TRY SAYING</div><strong>“Remind me to study at 7 PM”</strong><div class="small muted" style="margin-top:4px">Voice recognition depends on browser support and may need internet.</div></div></div></div>
+  <form id="commandForm" class="toolbar"><input id="commandInput" placeholder="Ask JARVIS or add a task…" aria-label="Command"><button class="primary" type="submit">Run</button></form>
+  <div class="grid" style="margin-top:13px">
+   <div class="card"><h3>Open tasks</h3><div class="metric" id="taskMetric">0</div><div class="small muted">Things to complete</div></div>
+   <div class="card"><h3>Upcoming</h3><div class="metric" id="upcomingMetric">0</div><div class="small muted">Reminders ahead</div></div>
+   <div class="card"><h3>Business leads</h3><div class="metric" id="leadMetric">0</div><div class="small muted">Saved prospects</div></div>
+   <div class="card"><h3>Drafts</h3><div class="metric" id="draftMetric">0</div><div class="small muted">Prepared locally</div></div>
+  </div>
+  <div class="section-head"><h2>Next up</h2><button class="subtle" data-go="tasks">All tasks →</button></div><div class="list" id="homeTasks"></div>
+  <div class="notice">Prototype mode: your data stays in this browser on this device. Gmail is not connected, calls are not placed automatically, and reminders are most reliable while this app is open.</div>
+ </section>
+
+ <section class="view" id="view-tasks">
+  <div class="greeting"><div class="eyebrow">PERSONAL SECRETARY</div><h2>Tasks & reminders</h2><p>Add tasks, deadlines and reminder times.</p></div>
+  <div class="card"><form class="form" id="taskForm">
+   <label>Task title<input id="taskTitle" required placeholder="e.g. Revise computer science"></label>
+   <label>Due date and time<input id="taskDue" type="datetime-local"></label>
+   <label>Remind me at<input id="taskReminder" type="datetime-local"></label>
+   <label>Priority<select id="taskPriority"><option>Normal</option><option>High</option><option>Urgent</option></select></label>
+   <button class="primary" type="submit">＋ Save task</button>
+  </form></div>
+  <div class="section-head"><h2>Your task list</h2><button id="enableNotifications">Enable notifications</button></div><div id="taskList" class="list"></div>
+  <div class="notice">For now, reminders run while JARVIS is open. Browser and Android background restrictions mean this prototype cannot guarantee alarms when closed. Use Google Calendar alerts as a dependable backup.</div>
+ </section>
+
+ <section class="view" id="view-email">
+  <div class="greeting"><div class="eyebrow">COMMUNICATIONS</div><h2>Email assistant</h2><p>Prepare replies in your style. Sending is not enabled in this prototype.</p></div>
+  <div class="card"><form class="form" id="emailForm">
+   <label>Recipient name or context<input id="emailTo" placeholder="e.g. Event organiser"></label>
+   <label>What did they say?<textarea id="emailIncoming" placeholder="Paste the email or summarise it here…" required></textarea></label>
+   <label>What should the reply achieve?<input id="emailGoal" placeholder="e.g. Confirm attendance, ask for details"></label>
+   <label>Your preferred tone<select id="emailTone"><option>Friendly and professional</option><option>Formal</option><option>Short and direct</option><option>Warm and enthusiastic</option></select></label>
+   <button class="primary" type="submit">Prepare reply</button>
+  </form></div>
+  <div class="section-head"><h2>Draft workspace</h2></div><div id="draftList" class="list"></div>
+  <div class="notice">This first version does not read or send Gmail. Never paste passwords, verification codes or highly sensitive information here. Gmail OAuth integration comes in the laptop phase.</div>
+ </section>
+
+ <section class="view" id="view-business">
+  <div class="greeting"><div class="eyebrow">BUSINESS GROWTH</div><h2>Opportunity tracker</h2><p>Start small. Validate demand. Track every follow-up.</p></div>
+  <div class="grid">
+   <div class="card"><h3>Leads</h3><div class="metric" id="bizLeads">0</div></div>
+   <div class="card"><h3>Won</h3><div class="metric" id="bizWon">0</div></div>
+   <div class="card"><h3>Revenue</h3><div class="metric" id="bizRevenue">₹0</div></div>
+   <div class="card"><h3>Expenses</h3><div class="metric" id="bizExpenses">₹0</div></div>
+  </div>
+  <div class="section-head"><h2>Add a lead</h2></div>
+  <div class="card"><form class="form" id="leadForm">
+   <label>Business / person<input id="leadName" required placeholder="Business name"></label>
+   <label>Contact or public website<input id="leadContact" placeholder="Website or business email"></label>
+   <label>Opportunity<input id="leadOpportunity" placeholder="e.g. Website redesign"></label>
+   <label>Next follow-up<input id="leadFollow" type="date"></label>
+   <label>Status<select id="leadStatus"><option>Researching</option><option>Ready to contact</option><option>Contacted</option><option>In discussion</option><option>Won</option><option>Closed</option></select></label>
+   <label>Potential / actual value (₹)<input id="leadValue" type="number" min="0" step="1" value="0"></label>
+   <button class="primary" type="submit">＋ Save lead</button>
+  </form></div>
+  <div class="section-head"><h2>Your pipeline</h2></div><div id="leadList" class="list"></div>
+  <div class="notice">Start with a small number of relevant prospects. Verify contact details and personalise outreach; don't automate bulk unsolicited messages.</div>
+ </section>
+
+ <section class="view" id="view-settings">
+  <div class="greeting"><div class="eyebrow">SYSTEM SETTINGS</div><h2>JARVIS configuration</h2><p>Choose how your assistant responds.</p></div>
+  <div class="card"><form id="settingsForm" class="form">
+   <label>What should JARVIS call you?<input id="userName" value="Rohit"></label>
+   <label>Speech rate <span class="small muted">Lower is slower</span><input id="speechRate" type="range" min=".7" max="1.25" step=".05" value=".92"></label>
+   <label><span><input id="speakReplies" type="checkbox" checked style="width:auto;margin-right:8px">Speak responses aloud</span></label>
+   <button class="primary" type="submit">Save settings</button>
+  </form></div>
+  <div class="section-head"><h2>Data & privacy</h2></div><div class="card">
+   <p class="muted small">Tasks, email drafts and leads are saved in this browser's local storage. They are not automatically backed up or synced to your laptop.</p>
+   <div class="actions"><button id="exportData">Export my data</button><button id="importData">Import backup</button><input id="importFile" type="file" accept="application/json" hidden><button class="danger" id="clearData">Delete all local data</button></div>
+  </div>
+  <div class="section-head"><h2>Current capabilities</h2></div><div class="card small muted">
+   ✓ Local tasks and business CRM<br>✓ Voice output when supported<br>✓ Voice commands when browser supports recognition<br>✓ In-app reminder checks<br>✕ Live Gmail connection<br>✕ Guaranteed background alarms<br>✕ Automatic phone calls<br>✕ Cross-device sync / cloud AI
+  </div>
+ </section>
+ <footer>JARVIS Personal Assistant · Starter build 0.1 · Keep your backups safe.</footer>
+</main>
+<nav aria-label="Main navigation">
+ <button class="active" data-view="home"><span>⌂</span>Home</button>
+ <button data-view="tasks"><span>◷</span>Tasks</button>
+ <button data-view="email"><span>✉</span>Email</button>
+ <button data-view="business"><span>↗</span>Business</button>
+ <button data-view="settings"><span>⚙</span>Settings</button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const $ = id => document.getElementById(id);
+const KEY = 'jarvis.mobile.v1';
+const emptyState = {tasks:[], drafts:[], leads:[], settings:{name:'Rohit',rate:.92,speak:true}, reminded:[]};
+let state = loadState();
+function loadState(){try{return {...emptyState,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return structuredClone(emptyState)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2600)}
+function fmtDate(v){if(!v)return 'No time set';const d=new Date(v);return isNaN(d)?v:d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN')}
+function speak(text){if(!state.settings.speak || !('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=Number(state.settings.rate)||.92;u.pitch=.86;window.speechSynthesis.speak(u)}
+function say(text){$('voiceStatus').textContent=text;$('voiceHint').textContent='JARVIS is ready for your next command.';speak(text)}
+function go(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+view));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));window.scrollTo({top:0,behavior:'smooth'});render()}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+function taskHtml(t){return `<div class="item"><div style="padding-top:3px"><input type="checkbox" ${t.done?'checked':''} aria-label="Complete task" data-complete="${t.id}"></div><div class="body"><strong style="${t.done?'text-decoration:line-through;opacity:.6':''}">${esc(t.title)}</strong><p>Due: ${esc(fmtDate(t.due))}${t.reminder?' · Remind: '+esc(fmtDate(t.reminder)):''}</p><span class="tag">${esc(t.priority||'Normal')}${t.done?' · Done':''}</span></div><button class="subtle" data-delete-task="${t.id}" aria-label="Delete task">✕</button></div>`}
+function render(){
+ $('dateLine').textContent=new Date().toLocaleDateString([], {weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+ $('taskMetric').textContent=state.tasks.filter(t=>!t.done).length;
+ $('upcomingMetric').textContent=state.tasks.filter(t=>!t.done&&t.reminder&&new Date(t.reminder)>new Date()).length;
+ $('leadMetric').textContent=state.leads.length;$('draftMetric').textContent=state.drafts.length;
+ $('homeTasks').innerHTML=state.tasks.filter(t=>!t.done).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,3).map(taskHtml).join('')||'<div class="empty">No tasks yet. Add your first reminder.</div>';
+ $('taskList').innerHTML=state.tasks.slice().sort((a,b)=>(a.done?1:0)-(b.done?1:0)).map(taskHtml).join('')||'<div class="empty">Your task list is clear.</div>';
+ $('draftList').innerHTML=state.drafts.slice().reverse().map(d=>`<div class="item"><div class="body"><strong>${esc(d.subject)}</strong><p>${esc(d.to||'No recipient specified')} · ${esc(d.created)}</p><p style="white-space:pre-wrap;color:var(--text);margin-top:9px">${esc(d.body)}</p><div class="actions"><button data-copy-draft="${d.id}">Copy draft</button><button class="danger" data-delete-draft="${d.id}">Delete</button></div></div></div>`).join('')||'<div class="empty">Prepared replies will appear here.</div>';
+ $('bizLeads').textContent=state.leads.length;$('leadMetric').textContent=state.leads.length;
+ $('bizWon').textContent=state.leads.filter(l=>l.status==='Won').length;
+ $('bizRevenue').textContent=money(state.leads.filter(l=>l.status==='Won').reduce((s,l)=>s+Number(l.value||0),0));
+ $('bizExpenses').textContent=money(state.expenses||0);
+ $('leadList').innerHTML=state.leads.slice().reverse().map(l=>`<div class="item"><div class="body"><strong>${esc(l.name)}</strong><p>${esc(l.opportunity||'Opportunity not specified')}</p><p>${esc(l.contact||'No contact saved')}${l.follow?' · Follow up: '+esc(l.follow):''}</p><span class="tag">${esc(l.status)} · ${money(l.value)}</span><div class="actions"><button data-cycle-lead="${l.id}">Next status</button><button data-edit-value="${l.id}">Update value</button><button class="danger" data-delete-lead="${l.id}">Delete</button></div></div></div>`).join('')||'<div class="empty">Add your first potential customer or business opportunity.</div>';
+ $('userName').value=state.settings.name||'Rohit';$('speechRate').value=state.settings.rate||.92;$('speakReplies').checked=state.settings.speak!==false;
+}
+$('taskForm').addEventListener('submit',e=>{e.preventDefault();const title=$('taskTitle').value.trim();if(!title)return;state.tasks.push({id:crypto.randomUUID(),title,due:$('taskDue').value,reminder:$('taskReminder').value,priority:$('taskPriority').value,done:false,created:Date.now()});e.target.reset();save();toast('Task saved.');say('Task saved. I will check your reminder while the app is running.');});
+$('taskList').addEventListener('change',e=>{if(e.target.dataset.complete){const t=state.tasks.find(x=>x.id===e.target.dataset.complete);if(t)t.done=e.target.checked;save();}});
+document.body.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.deleteTask){state.tasks=state.tasks.filter(t=>t.id!==b.dataset.deleteTask);save();toast('Task deleted.')}
+ if(b.dataset.deleteDraft){state.drafts=state.drafts.filter(t=>t.id!==b.dataset.deleteDraft);save();toast('Draft deleted.')}
+ if(b.dataset.copyDraft){const d=state.drafts.find(x=>x.id===b.dataset.copyDraft);if(d){try{await navigator.clipboard.writeText(`Subject: ${d.subject}\n\n${d.body}`);toast('Draft copied.')}catch{toast('Clipboard unavailable; select and copy the draft text.')}}}
+ if(b.dataset.deleteLead){state.leads=state.leads.filter(l=>l.id!==b.dataset.deleteLead);save();toast('Lead deleted.')}
+ if(b.dataset.cycleLead){const l=state.leads.find(x=>x.id===b.dataset.cycleLead);const statuses=['Researching','Ready to contact','Contacted','In discussion','Won','Closed'];if(l)l.status=statuses[(statuses.indexOf(l.status)+1)%statuses.length];save();}
+ if(b.dataset.editValue){const l=state.leads.find(x=>x.id===b.dataset.editValue);if(l){const v=prompt('Enter actual/potential value in rupees',l.value||0);if(v!==null&&v.trim()!==''&&Number(v)>=0)l.value=Number(v);save();}}
+});
+$('emailForm').addEventListener('submit',e=>{e.preventDefault();const incoming=$('emailIncoming').value.trim(),goal=$('emailGoal').value.trim(),to=$('emailTo').value.trim(),tone=$('emailTone').value;let body;
+ if(/confirm|attend|meeting/i.test(goal+' '+incoming))body=`Hi${to?', '+to:''},\n\nThank you for your email. ${goal?goal+'.':'I appreciate the update.'} Please let me know if there is anything else I should prepare.\n\nBest regards,\n${state.settings.name}`;
+ else body=`Hi${to?', '+to:''},\n\nThank you for reaching out. ${goal?goal+'.':'I appreciate you sharing this with me.'} Please let me know if there are any further details I should consider.\n\nBest regards,\n${state.settings.name}`;
+ if(tone==='Formal')body=body.replace(/^Hi/m,'Dear').replace('Thank you for reaching out.','Thank you for your correspondence.');
+ if(tone==='Short and direct')body=`Hi${to?', '+to:''},\n\n${goal||'Thank you for your email. I will review this and get back to you.'}\n\nRegards,\n${state.settings.name}`;
+ if(tone==='Warm and enthusiastic')body=body.replace('Thank you for your email.','Thank you for your email!').replace('I appreciate the update.','I appreciate the update and look forward to connecting.');
+ state.drafts.push({id:crypto.randomUUID(),to,subject:'Re: Your email',body,created:new Date().toLocaleString()});save();e.target.reset();toast('Reply draft prepared locally. Review before sending.');go('email');
+});
+$('leadForm').addEventListener('submit',e=>{e.preventDefault();state.leads.push({id:crypto.randomUUID(),name:$('leadName').value.trim(),contact:$('leadContact').value.trim(),opportunity:$('leadOpportunity').value.trim(),follow:$('leadFollow').value,status:$('leadStatus').value,value:Number($('leadValue').value||0)});e.target.reset();save();toast('Lead saved.');});
+$('settingsForm').addEventListener('submit',e=>{e.preventDefault();state.settings={name:$('userName').value.trim()||'Rohit',rate:Number($('speechRate').value),speak:$('speakReplies').checked};save();toast('Settings saved.');say('Settings saved. At your service.');});
+$('enableNotifications').addEventListener('click',async()=>{if(!('Notification'in window)){toast('Notifications are not supported in this browser.');return}const p=await Notification.requestPermission();toast(p==='granted'?'Notifications enabled.':'Notification permission not granted.');});
+function checkReminders(){const now=Date.now();let changed=false;for(const t of state.tasks){if(t.done||!t.reminder)continue;const rt=new Date(t.reminder).getTime();if(rt<=now&&rt>now-60000&&!state.reminded.includes(t.id)){state.reminded.push(t.id);changed=true;const msg='Reminder: '+t.title;toast(msg);speak(msg);if('Notification'in window&&Notification.permission==='granted'){try{new Notification('JARVIS reminder',{body:t.title})}catch{}}}}if(changed)localStorage.setItem(KEY,JSON.stringify(state))}
+setInterval(checkReminders,15000);
+function handleCommand(raw){const c=raw.trim();if(!c)return;const m=c.match(/remind me to (.+?)(?: at (.+))?$/i);if(m){let title=m[1].trim(),dt='';if(m[2]){const tm=m[2].match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);if(tm){let h=Number(tm[1]),min=Number(tm[2]||0);if(tm[3]?.toLowerCase()==='pm'&&h<12)h+=12;if(tm[3]?.toLowerCase()==='am'&&h===12)h=0;const d=new Date();d.setHours(h,min,0,0);if(d.getTime()<Date.now())d.setDate(d.getDate()+1);dt=new Date(d.getTime()-5*60000).toISOString().slice(0,16)}}state.tasks.push({id:crypto.randomUUID(),title,due:'',reminder:dt,priority:'Normal',done:false,created:Date.now()});save();say('I have added '+title+(dt?' to your reminder list.':' to your task list.'));return}
+ if(/what.*(todo|tasks|today)|my tasks/i.test(c)){const pending=state.tasks.filter(t=>!t.done);say(pending.length?`You have ${pending.length} open tasks. ${pending.slice(0,3).map(t=>t.title).join('. ')}`:'You have no open tasks.');return}
+ if(/business|lead|customer/i.test(c)){go('business');say('Opening your business tracker.');return}
+ if(/email|reply|draft/i.test(c)){go('email');say('Opening your email workspace.');return}
+ if(/help|what can you do/i.test(c)){say('I can save tasks, check your task list, prepare email drafts, and track business leads. Gmail connection and phone calls are not active yet.');return}
+ state.tasks.push({id:crypto.randomUUID(),title:c,due:'',reminder:'',priority:'Normal',done:false,created:Date.now()});save();say('I saved that as a task: '+c)}
+$('commandForm').addEventListener('submit',e=>{e.preventDefault();handleCommand($('commandInput').value);$('commandInput').value=''});
+$('micBtn').addEventListener('click',()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Voice recognition is not supported here. Try Chrome, or type your command.');say('Voice recognition is unavailable in this browser.');return}const r=new SR();r.lang='en-IN';r.interimResults=false;r.maxAlternatives=1;$('voiceStatus').textContent='Listening…';r.onresult=e=>{const text=e.results[0][0].transcript;$('commandInput').value=text;handleCommand(text)};r.onerror=()=>{toast('Could not hear that. Try again or type.');$('voiceStatus').textContent='Standing by.'};r.onend=()=>{$('voiceStatus').textContent='Standing by.'};r.start()});
+$('exportData').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='jarvis-backup.json';a.click();URL.revokeObjectURL(a.href);toast('Backup exported.')});
+$('importData').addEventListener('click',()=>$('importFile').click());
+$('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d||!Array.isArray(d.tasks)||!Array.isArray(d.leads))throw Error();state={...emptyState,...d};save();toast('Backup imported.')}catch{toast('That backup file is not valid.')}e.target.value=''});
+$('clearData').addEventListener('click',()=>{if(confirm('Delete all JARVIS tasks, drafts and leads saved on this device? Export a backup first if needed.')){state=structuredClone(emptyState);save();toast('Local data deleted.')}});
+render();
+if ('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')) { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>
